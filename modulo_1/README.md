@@ -56,3 +56,10 @@ Este projeto é ideal para entender:
 - Gerenciamento de estado com Pinia
 - Comunicação entre componentes
 - Melhores práticas de arquitetura frontend
+
+---------------------------------------------
+
+## Instalações necessárias
+- npm install vue-router@4
+- npm install d- tailwindcss postcss autoprefixer. Para instalação do Tailwind
+- npm install -D @tailwindcss/postcss

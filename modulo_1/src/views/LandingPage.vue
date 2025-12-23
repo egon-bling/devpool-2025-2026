@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import BarraHome from './components/Home/BarraHome.vue';
 
 </script>
 
 <template>
-<BarraHome/>
+    
 </template>
 
 <style scoped>
