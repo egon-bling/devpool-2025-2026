@@ -5,6 +5,9 @@ import BarraHome from './components/Home/BarraHome.vue';
 
 <template>
 <BarraHome/>
+<main>
+    <RouterView />
+</main>
 </template>
 
 <style scoped>
