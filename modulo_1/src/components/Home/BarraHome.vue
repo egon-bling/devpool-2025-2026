@@ -15,17 +15,13 @@
     </a>    
 </div>
 
-<router-link to="/produtos" class="bg-blue-600 text-white px-4 py-2 rounded">
-    Entrar
-</router-link>
+<botao-auth/>
 
 </nav>
-
 </template>
 
 <script setup lang="ts">
-
-
+import BotaoAuth from './BotaoAuth.vue';
 </script>
 
 <style scoped>
