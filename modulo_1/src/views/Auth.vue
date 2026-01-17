@@ -1,71 +1,60 @@
 <script setup>
-    import { onMounted } from 'vue';
+    import { onMounted, computed } from 'vue';
     import { useRouter, useRoute } from 'vue-router';
+    import { useAuthStore } from '../stores/authStore';
 
     const router = useRouter();
     const route = useRoute();
+    const authStore = useAuthStore();
+
+    const mode = computed(() => (route.query.mode) || 'callback');
+
+    const Texto = computed(() =>{
+        if (mode.value === 'logout') return 'Saindo da Conta...';
+        if (mode.value === 'error') return 'Erro em se autenticar';
+        return 'Finalizando Conexão, aguarde.';
+    });
+
+    const TextoSec = computed(() => {
+    if (mode.value === 'logout') return 'Até mais! Redirecionando...';
+    if (mode.value === 'error') return 'Não foi possível conectar no Bling.';
+    return 'Aguarde enquanto sincronizamos sua conta.';
+    });
 
     onMounted(async () => {
-        const code = route.query.code;
-        const state = route.query.state;
+        //logout
+        if (mode.value === 'logout') {
+            authStore.logout();
+            setTimeout(() => router.push('/'), 1500);
+            return
+        }
+        //sucesso
+        const { code, state } = route.query;
         const savedState = localStorage.getItem('bling_state');
-
-        if (!state || state !== savedState) {
-            console.error('State não confere');
-            router.push('/')
+        //validacao
+        if (!code || !state || state !== savedState) {
+            console.error('State inválido ou código ausente');
+            router.push('/?error=invalid_state');
             return;
         }
 
-        if (code) {
-            const tokenSucesso = await trocarCodeToken(code);
-
-            if (tokenSucesso) {
-                router.push('/produtos');
-            }
-            else {
-                router.push ('/');
-            }
-        }
-    })
-
-    const trocarCodeToken = async (code) => {
-        const clientId = '0c983835be17486ddac231a6e8a1fd4e624523e6';
-        const clientSecret = '2d2f1174d9f4ec82d908b256f6bb77b6a3db2d7cf7679817e3faddc2f809';
-        const authHeader = btoa(`${clientId}:${clientSecret}`);
-
-        const urlencoded = new URLSearchParams();
-        urlencoded.append("grant_type", "authorization_code");
-        urlencoded.append("code", code); //expira em 1 minuto
-        urlencoded.append("redirect_uri", "http://localhost:5173/auth");
-
         try {
-            const response = await fetch("https://www.bling.com.br/Api/v3/oauth/token",{
-                method: "POST",
-                headers: {"Authorization": `Basic ${authHeader}`,
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: urlencoded,
-            });
-            
-            const data = await response.json();
-
-            if (data.access_token) {
-                localStorage.setItem('bling_access_token', data.access_token);
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.error("Erro na troca do token:", error);
-            return false;
+            await authStore.handelAuthCallback(code);
+            localStorage.removeItem('bling_state');
+            router.push('/produtos');
+        } catch (error){
+            console.error('Falha ao obter token:', error);
+            router.push('/');
         }
-    };
+    });
 </script>
 
 <template>
-    <div class="flex items-center justify-center min-h-screen bg-slate-50">
+    <div class="min-h-screen bg-slate-900 flex items-center justify-center">
     <div class="text-center">
-    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-    <p class="text-slate-600 font-medium">Autenticando</p>
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto"></div>
+    <h2 class="mt-6 text-xl font-semibold text-white">{{ Texto }}</h2>
+    <p class="mt-2 text-slate-400">{{ TextoSec }}</p>
     </div>
-    </div>
+</div>
 </template>

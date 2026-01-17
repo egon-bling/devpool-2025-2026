@@ -1,27 +1,30 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useAuthStore } from '../stores/authStore';
 
+const authStore = useAuthStore();
 const produtos = ref([]);
+const carregando = ref(true);
 
 const carregarProdutos = async () => {
-  const token = localStorage.getItem('bling_access_token');
-
-  const myHeaders = new Headers();
-  myHeaders.append("Authorization", `Bearer ${token}`);
-
-  const requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
+  const token = authStore.accessToken;
+  
 
   try {
-    const response = await fetch("https://www.bling.com.br/Api/v3/produtos", requestOptions);
+    const response = await fetch("/api-bling/Api/v3/produtos", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
     const result = await response.json();
-    
     produtos.value = result.data; 
   } catch (error) {
     console.error('Erro ao carregar produtos:', error);
+  } finally {
+    carregando.value = false;
   }
 };
 
