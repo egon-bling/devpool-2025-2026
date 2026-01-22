@@ -4,12 +4,11 @@ import BarraHome from './components/Home/BarraHome.vue';
 </script>
 
 <template>
-<BarraHome/>
-<main>
-    <RouterView />
-</main>
+  <div class="antialiased font-sans text-slate-900">
+    <BarraHome />
+    
+    <main class="pt-16">
+      <router-view />
+    </main>
+  </div>
 </template>
-
-<style scoped>
-
-</style>

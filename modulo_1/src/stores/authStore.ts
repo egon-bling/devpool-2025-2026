@@ -24,7 +24,6 @@ export const useAuthStore = defineStore('auth', {
         logout() {
             this.accessToken = null;
             localStorage.removeItem('bling_access_token');
-            localStorage.removeItem('bling_refresh_token');
             localStorage.removeItem('bling_auth_state');
         }
     }

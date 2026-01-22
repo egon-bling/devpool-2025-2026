@@ -10,8 +10,18 @@ const paginaAtual = ref(1);
 
 const filtros = ref ({
   nome: '',
-  situacao: ''
+  situacao: 1,
+  dataInicio: '',
+  dataFim: ''
 });
+
+const nomesStatus = {
+  1: 'Últimos Incluídos',
+  2: 'Ativos',
+  3: 'Inativos',
+  4: 'Excluídos',
+  5: 'Todos'
+};
 
 const carregarProdutos = async () => {
   carregando.value = true;
@@ -23,13 +33,41 @@ const carregarProdutos = async () => {
   }
 
   try {
-    const result = await produtoService.listar(token, paginaAtual.value, 10, filtros.value);
-      produtos.value = result.data || [];
-      } catch (error) {
-        console.error('Erro ao carregar produtos:', error);
-        } finally {
-          carregando.value = false;
-          }
+    // 1. Criamos o objeto que será enviado
+    const paramsParaService = { ...filtros.value };
+
+    // 2. Formatamos as datas apenas se elas existirem
+    if (paramsParaService.dataInicio) {
+      paramsParaService.dataInclusaoInicial = `${paramsParaService.dataInicio} 00:00:00`;
+    }
+    if (paramsParaService.dataFim) {
+      paramsParaService.dataInclusaoFinal = `${paramsParaService.dataFim} 23:59:59`;
+    }
+
+    // 3. ATENÇÃO AQUI: Enviamos 'paramsParaService' e NÃO 'filtros.value'
+    const result = await produtoService.listar(token, paginaAtual.value, 10, paramsParaService);
+    
+    produtos.value = result.data || [];
+  } catch (error) {
+    console.error('Erro ao carregar produtos:', error);
+  } finally {
+    carregando.value = false;
+  }
+};
+
+const aplicarFiltros = () => {
+  paginaAtual.value = 1; 
+  carregarProdutos();   
+};
+
+const limparFiltros = () => {
+  filtros.value = { 
+    nome: '', 
+    situacao: 1, 
+    dataInicio: '', 
+    dataFim: '' 
+  };
+  aplicarFiltros(); 
 };
 
 
@@ -45,15 +83,6 @@ const paginaAnterior = () => {
   }
 };
 
-const aplicarFiltros = () => {
-  paginaAtual.value = 1; 
-  carregarProdutos();
-};
-
-const limparFiltros = () => {
-  filtros.value = { nome: '', situacao: '' };
-  aplicarFiltros();
-};
 
 onMounted(carregarProdutos);
 </script>
@@ -85,34 +114,50 @@ onMounted(carregarProdutos);
       />
     </div>
 
+    <div class="w-full md:w-40">
+      <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Data Inicial</label>
+      <input 
+        type="date" 
+        v-model="filtros.dataInicio"
+        class="w-full px-3 py-2 bg-slate-50 border border-gray-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div class="w-full md:w-40">
+      <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Data Final</label>
+      <input 
+        type="date" 
+        v-model="filtros.dataFim"
+        class="w-full px-3 py-2 bg-slate-50 border border-gray-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
     <div class="w-full md:w-48">
       <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Situação</label>
       <select 
         v-model="filtros.situacao"
         class="w-full px-3 py-2 bg-slate-50 border border-gray-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500"
       >
-        <option value="">Todos</option>
-        <option value="A">Ativos</option>
-        <option value="E">Excluídos</option>
+        <option value="1">Últimos Incluidos</option>
+        <option value="2">Ativos</option>
+        <option value="3">Inativos</option>
+        <option value="4">Excluídos</option>
+        <option value="5">Todos</option>
       </select>
     </div>
 
     <div class="flex gap-2">
-      <button @click="limparFiltros" class="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-md transition">
-        Limpar
-      </button>
-      <button @click="aplicarFiltros" class="bg-blue-600 text-white px-6 py-2 rounded-md text-sm font-bold hover:bg-blue-700 transition shadow-sm">
-        Filtrar
-      </button>
+      <button @click="limparFiltros" class="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-md transition">Limpar</button>
+      <button @click="aplicarFiltros" class="bg-blue-600 text-white px-6 py-2 rounded-md text-sm font-bold hover:bg-blue-700 transition shadow-sm">Filtrar</button>
     </div>
 
   </div>
 </div>
 
     <div class="max-w-7xl mx-auto bg-white rounded-b-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div class="max-w-7xl mx-auto mb-2 text-xs text-gray-400">
+   <div class="max-w-7xl mx-auto mb-2 text-xs text-gray-400">
   Filtrando por: <b>{{ filtros.nome || 'Nenhum nome' }}</b> | 
-  Status: <b>{{ filtros.situacao || 'Todos' }}</b>
+  Status: <b>{{ nomesStatus[filtros.situacao] }}</b>
 </div>
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
