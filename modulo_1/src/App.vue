@@ -1,6 +1,7 @@
 <template>
-    <Navbar />
+    <BarraDeNavegacao />
     <Hero />
+    <Funcionalidades />
     <Planos />
     <Contato />
 
@@ -19,35 +20,32 @@
 </template>
 
 <script setup lang="ts">
+import BarraDeNavegacao from './components/BarraDeNavegacao.vue';
 import Contato from './components/Contato.vue';
+import Funcionalidades from './components/Funcionalidades.vue';
 import Hero from './components/Hero.vue';
-import Navbar from './components/Navbar.vue';
 import Planos from './components/Planos.vue';
-
-
 </script>
 
 <style>
-.hero {
-    background-color: #fcfcfc;
+html, body {
+  background-color: #ffffff;
+  overflow-x: hidden;
 }
-
-.card-destaque {
-    border: 2px solid #48c774;
-    transform: scale(1.05);
-    z-index: 1;
+section {
+    scroll-margin-top: 4rem;
 }
-
-.placeholder-img {
-    border: 2px dashed #ccc;
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    background: #f5f5f5;
+html {
+  scroll-behavior: smooth;
 }
 .column {
     border: none !important;
 }
+.footer {
+  background-color: #fafafa;
+  border-top: 1px solid #eeeeee;
+  padding: 3rem 1.5rem;
+}
+
+
 </style>
