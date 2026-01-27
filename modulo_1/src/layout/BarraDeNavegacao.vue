@@ -22,7 +22,7 @@
           
           <div class="navbar-item">
             <div class="buttons">
-              <a class="button is-dark is-rounded" href="/login">
+              <a class="button is-dark is-rounded" @click="iniciarLogin">
                 <strong>ENTRAR</strong>
               </a>
             </div>
@@ -35,7 +35,14 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { loginNoBling } from '../services/auth';
+
 const menuAtivo = ref(false);
+
+const iniciarLogin = () => {
+  loginNoBling();
+};
+
 </script>
 
 <style scoped>
