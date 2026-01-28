@@ -1,59 +1,63 @@
 <template>
-  <nav class="pagination is-centered is-rounded mt-5" role="navigation" aria-label="pagination">
-    <button 
-      class="pagination-previous" 
-      :disabled="paginaAtual === 1" 
-      @click="$emit('mudarPagina', paginaAtual - 1)"
-    >
-      <span class="icon"><i class="fas fa-chevron-left"></i></span>
-    </button>
+  <div class="field is-grouped is-grouped-centered mt-6">
+    <p class="control">
+      <button 
+        class="button is-light" 
+        :disabled="paginaAtual <= 1 || isLoading"
+        @click="$emit('mudar-pagina', paginaAtual - 1)"
+      >
+        <span class="icon"><i class="fas fa-chevron-left"></i></span>
+        <span>Anterior</span>
+      </button>
+    </p>
 
-    <button 
-      class="pagination-next" 
-      :disabled="!temMais" 
-      @click="$emit('mudarPagina', paginaAtual + 1)"
-    >
-      <span class="icon"><i class="fas fa-chevron-right"></i></span>
-    </button>
+    <p class="control">
+      <span class="button is-static is-dark">
+        Página {{ paginaAtual }}
+      </span>
+    </p>
 
-    <ul class="pagination-list">
-      <li v-for="n in paginasVisiveis" :key="n">
-        <a 
-          class="pagination-link" 
-          :class="{ 'is-current': n === paginaAtual }"
-          @click="$emit('mudarPagina', n)"
-        >
-          {{ n }}
-        </a>
-      </li>
-    </ul>
-  </nav>
+    <p class="control">
+      <button 
+        class="button is-light" 
+        :disabled="!temMais || isLoading"
+        @click="$emit('mudar-pagina', paginaAtual + 1)"
+      >
+        <span>Próxima</span>
+        <span class="icon"><i class="fas fa-chevron-right"></i></span>
+      </button>
+    </p>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+interface Props {
+  paginaAtual?: number;
+  temMais?: boolean;
+  isLoading?: boolean;
+}
 
-const props = defineProps<{
-  paginaAtual: number;
-  temMais: boolean;
-}>();
-
-defineEmits(['mudarPagina']);
-
-const paginasVisiveis = computed(() => {
-  const atual = props.paginaAtual;
-  const range = [];
-
-  let inicio = Math.max(1, atual - 2);
-  
-  for (let i = inicio; i <= atual; i++) {
-    range.push(i);
-  }
-
-  if (props.temMais) {
-    range.push(atual + 1);
-  }
-
-  return range;
+withDefaults(defineProps<Props>(), {
+  paginaAtual: 1,
+  temMais: false,
+  isLoading: false
 });
+
+defineEmits<{
+  (e: 'mudar-pagina', pagina: number): void
+}>();
 </script>
+
+<style scoped>
+.field.is-grouped .control:not(:first-child):not(:last-child) .button {
+  border-radius: 0;
+}
+.field.is-grouped .control:first-child .button {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+.field.is-grouped .control:last-child .button {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+</style>
