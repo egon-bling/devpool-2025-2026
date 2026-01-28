@@ -1,13 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router'; 
 import { produtoService } from '../services/produtos.services';
 import { useAuthStore } from '../stores/authStore';
 
 const authStore = useAuthStore();
+const router = useRouter(); 
 const produtos = ref([]); 
 const carregando = ref(true);
 const paginaAtual = ref(1);
-
 const filtros = ref ({
   nome: '',
   situacao: 1,
@@ -33,18 +34,14 @@ const carregarProdutos = async () => {
   }
 
   try {
-    // 1. Criamos o objeto que será enviado
     const paramsParaService = { ...filtros.value };
 
-    // 2. Formatamos as datas apenas se elas existirem
     if (paramsParaService.dataInicio) {
       paramsParaService.dataInclusaoInicial = `${paramsParaService.dataInicio} 00:00:00`;
     }
     if (paramsParaService.dataFim) {
       paramsParaService.dataInclusaoFinal = `${paramsParaService.dataFim} 23:59:59`;
     }
-
-    // 3. ATENÇÃO AQUI: Enviamos 'paramsParaService' e NÃO 'filtros.value'
     const result = await produtoService.listar(token, paginaAtual.value, 10, paramsParaService);
     
     produtos.value = result.data || [];
@@ -81,6 +78,11 @@ const paginaAnterior = () => {
     paginaAtual.value--;
     carregarProdutos();
   }
+};
+
+const irParaEdicao = (id) => {
+  if (!id) return;
+  router.push(`/produtos/editar/${id}`);
 };
 
 
@@ -186,7 +188,12 @@ onMounted(carregarProdutos);
             <td class="px-6 py-4 text-xs text-gray-400">{{ produto.unidade || 'un' }}</td>
             <td class="px-6 py-4 text-right">
               <div class="flex justify-end gap-3 text-xs font-bold">
-                <button class="text-blue-600 hover:text-blue-800">Editar</button>
+                <button 
+                  @click="irParaEdicao(produto.id)" 
+                  class="text-blue-600 hover:text-blue-900 font-bold"
+                    >
+                   Editar
+                  </button>
                 <button class="text-red-500 hover:text-red-700">Excluir</button>
               </div>
             </td>

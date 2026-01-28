@@ -1,45 +1,36 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-
-interface ProductData {
-  image: string;
-  inStock: boolean;
-}
-
-interface ProductsData {
-  [key: string]: ProductData;
-}
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import { apiClient } from '../services/api';
 
 export const useProductStore = defineStore('product', () => {
-  // Estado
-  const selectedColor = ref<string>('azul')
+    const carregando = ref(false);
+    const produtos = ref([]);
 
-  // Dados dos produtos
-  const productData: ProductsData = {
-    azul: {
-      image: 'https://www.comerciomix.com.br/media/catalog/product/cache/39699d3c43c18428eb057c8e614b0843/c/a/camiseta-azul-royal-para-sublima_o-tradicional_1.jpg',
-      inStock: true,
-    },
-    preto: {
-      image: 'https://img.irroba.com.br/fit-in/600x600/filters:fill(fff):quality(80)/estampar/catalog/camisetas/preto-verso.jpg',
-      inStock: false,
-    },
+    async function buscarProdutoPorId(id: string) {
+        const token = localStorage.getItem('bling_access_token') || '';
+        const res = await apiClient.request(`/produtos/${id}`, 'GET', token);
+        return res.data;
+    }
+
+   async function salvarEdicao(id: string, payload: any) {
+  carregando.value = true;
+  try {
+    const { id: _, ...dadosParaEnviar } = payload; 
+        const token = localStorage.getItem('bling_access_token') || '';
+        await apiClient.request(`/produtos/${id}`, 'PUT', token, dadosParaEnviar);
+    
+    return { sucesso: true };
+  } catch (error: any) {
+    console.error("Erro ao salvar:", error);
+    return { sucesso: false, erro: error.message };
+  } finally {
+    carregando.value = false;
   }
-
-  // Getters (computed)
-  const currentImage = computed(() => productData[selectedColor.value].image)
-  const isButtonDisabled = computed(() => !productData[selectedColor.value].inStock)
-
-  // Actions
-  function setSelectedColor(color: string) {
-    selectedColor.value = color
-  }
-
-  return {
-    selectedColor,
-    currentImage,
-    isButtonDisabled,
-    setSelectedColor,
-  }
-})
-
+}
+    return {
+        carregando,
+        produtos,
+        buscarProdutoPorId,
+        salvarEdicao
+    };
+});

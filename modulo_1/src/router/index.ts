@@ -1,27 +1,20 @@
-import { createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router'
-import LandingPage from '../views/LandingPage.vue'
-import Auth from '../views/Auth.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import LandingPage from '../views/LandingPage.vue';
+import Produtos from '../views/Produtos.vue';
+import ProdutoEdicao from '../views/ProdutoEdicao.vue';
+import Auth from '../views/Auth.vue';
 
-const routes: RouteRecordRaw[] = [
-    {
-        path: '/',
-        name: 'LandingPage',
-        component: LandingPage
-    },
-
-    {
-        path: '/auth',
-        name: 'auth',
-        component: () => import('../views/Auth.vue')
-    },
-
-    {
-        path: '/produtos',
-        name: 'Produtos',
-        component: () => import('../views/Produtos.vue'),
-        meta: {requiresAuth: true}
-    },
-]
+const routes = [
+  { path: '/', component: LandingPage },
+  { path: '/auth', component: Auth },
+  { path: '/produtos', component: Produtos },
+  { 
+    path: '/produtos/editar/:id', 
+    name: 'ProdutoEdicao',
+    component: ProdutoEdicao,
+    props: true 
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(),
