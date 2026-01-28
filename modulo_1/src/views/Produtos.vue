@@ -14,32 +14,42 @@
         {{ mensagemErro }}
       </div>
 
-      <div v-if="carregando && !produtos.length" class="has-text-centered my-6">
-      </div>
+      <div class="box mt-5 table-container-fixed">
+        <div v-if="carregando" class="has-text-centered my-5">
+          <button class="button is-loading is-ghost">Carregando</button>
+        </div>
 
-      <div v-else class="box mt-5">
-        <table class="table is-fullwidth is-striped is-hoverable">
+        <table class="table is-fullwidth is-striped is-hoverable table-fixed">
           <thead>
             <tr>
-              <th>Código (SKU)</th>
-              <th>Nome</th>
-              <th>Preço</th>
-              <th>Situação</th>
+              <th style="width: 160px;">Código (SKU)</th>
+              <th>Nome</th> <th style="width: 130px;">Preço</th>
+              <th style="width: 120px;" class="has-text-centered">Situação</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="produto in produtos" :key="produto.id">
-              <td>{{ produto.codigo }}</td>
-              <td>{{ produto.nome }}</td>
-              <td>{{ Number(produto.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</td>
-              <td>
+              <td class="truncate" :title="produto.codigo">
+                <strong>{{ produto.codigo }}</strong>
+              </td>
+              
+              <td class="truncate" :title="produto.nome">
+                {{ produto.nome }}
+              </td>
+              
+              <td class="truncate">
+                {{ Number(produto.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+              </td>
+              
+              <td class="has-text-centered">
                 <span :class="getClassSituacao(produto.situacao)">
                   {{ getLabelSituacao(produto.situacao) }}
                 </span>
               </td>
             </tr>
+            
             <tr v-if="produtos.length === 0 && !carregando">
-              <td colspan="4" class="has-text-centered py-5">
+              <td colspan="4" class="has-text-centered py-6 is-size-5 has-text-grey">
                 Nenhum produto encontrado com os filtros selecionados.
               </td>
             </tr>
@@ -47,8 +57,12 @@
         </table>
       </div>
 
-      <Paginacao v-if="produtos.length > 0" :pagina-atual="pagina" :tem-mais="temMaisPaginas"
-        @mudar-pagina="trocarPagina" />
+      <Paginacao 
+        :pagina-atual="pagina" 
+        :tem-mais="temMaisPaginas"
+        :is-loading="carregando"
+        @mudar-pagina="trocarPagina" 
+      />
     </div>
   </section>
 </template>
@@ -66,34 +80,27 @@ const erro = ref(false);
 const mensagemErro = ref('');
 
 const pagina = ref(1);
-const temMaisPaginas = ref(true);
+const temMaisPaginas = ref(false);
 
 const filtrosAtivos = reactive({
   nome: '',
   sku: '',
   dataInicio: '',
   dataFim: '',
-  situacao: ''
+  situacao: '1' 
 });
 
 const getClassSituacao = (situacao: string) => {
-  const map: Record<string, string> = {
-    'A': 'is-success',
-    'I': 'is-warning',
-    'E': 'is-danger'
-  };
+  const map: Record<string, string> = { 'A': 'is-success', 'I': 'is-warning', 'E': 'is-danger' };
   return ['tag', map[situacao] || 'is-light'];
 };
 
 const getLabelSituacao = (situacao: string) => {
-  const map: Record<string, string> = {
-    'A': 'Ativo',
-    'I': 'Inativo',
-    'E': 'Excluído'
-  };
+  const map: Record<string, string> = { 'A': 'Ativo', 'I': 'Inativo', 'E': 'Excluído' };
   return map[situacao] || situacao;
 };
 
+// Ações
 const handlePesquisa = (novosFiltros: any) => {
   Object.assign(filtrosAtivos, novosFiltros);
   pagina.value = 1;
@@ -101,27 +108,25 @@ const handlePesquisa = (novosFiltros: any) => {
 };
 
 const handleLimpar = () => {
-  filtrosAtivos.nome = '';
-  filtrosAtivos.sku = '';
-  filtrosAtivos.dataInicio = '';
-  filtrosAtivos.dataFim = '';
-  filtrosAtivos.situacao = '';
-
+  Object.assign(filtrosAtivos, { nome: '', sku: '', dataInicio: '', dataFim: '', situacao: '1' });
   pagina.value = 1;
   buscarProdutos();
 };
 
 const trocarPagina = (novaPagina: number) => {
+  if (novaPagina < 1 || (novaPagina > pagina.value && !temMaisPaginas.value)) return;
+  
   pagina.value = novaPagina;
   buscarProdutos();
 };
 
 const buscarProdutos = async () => {
+  if (carregando.value) return; 
+
   carregando.value = true;
   erro.value = false;
 
   const token = localStorage.getItem('bling_access_token');
-
   if (!token) {
     router.push('/');
     return;
@@ -132,11 +137,7 @@ const buscarProdutos = async () => {
 
     if (filtrosAtivos.nome) url += `&nome=${encodeURIComponent(filtrosAtivos.nome)}`;
     if (filtrosAtivos.sku) url += `&codigo=${encodeURIComponent(filtrosAtivos.sku)}`;
-
-    if (filtrosAtivos.situacao) {
-      url += `&criterio=${filtrosAtivos.situacao}`;
-    }
-
+    if (filtrosAtivos.situacao) url += `&criterio=${filtrosAtivos.situacao}`;
     if (filtrosAtivos.dataInicio) url += `&dataAlteracaoInicial=${filtrosAtivos.dataInicio}`;
     if (filtrosAtivos.dataFim) url += `&dataAlteracaoFinal=${filtrosAtivos.dataFim}`;
 
@@ -146,8 +147,10 @@ const buscarProdutos = async () => {
     });
 
     const dados = await resposta.json();
+    
     if (resposta.ok) {
       produtos.value = dados.data || [];
+
       temMaisPaginas.value = produtos.value.length === 10;
     } else {
       if (resposta.status === 404) {
@@ -161,6 +164,7 @@ const buscarProdutos = async () => {
     erro.value = true;
     mensagemErro.value = err.message;
     produtos.value = [];
+    temMaisPaginas.value = false;
   } finally {
     carregando.value = false;
   }
@@ -168,3 +172,20 @@ const buscarProdutos = async () => {
 
 onMounted(buscarProdutos);
 </script>
+
+<style scoped>
+.table-fixed {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-container-fixed {
+  min-height: 550px;
+}
+</style>
