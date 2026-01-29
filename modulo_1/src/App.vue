@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <main>
     <h1>Produto com Pinia</h1>
     <div class="container">
@@ -15,5 +15,10 @@ import ProductPage from './components/ProductPage.vue';
 
 <style>
 /* Estilos adicionais específicos do App */
-</style>
+</style> -->
 
+
+<!-- Agora, <router-view /> renderiza a página atual de acordo com a rota -->
+<template>
+  <router-view />
+</template>
