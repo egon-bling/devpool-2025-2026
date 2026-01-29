@@ -5,6 +5,7 @@ Todos se comunicam indiretamente, por meio da store. */
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import axios from 'axios' // Importa axios para chamadas HTTP
 
 interface ProductData {
   image: string;
@@ -42,11 +43,32 @@ export const useProductStore = defineStore('product', () => {
     selectedColor.value = color
   }
 
+  //Autenticação simulada. Método que simula o login usando token fixo.
+  const token = ref<string>('0a07ad723f12b0945c513951d19121cd0ada7b05') //Token fixo para simulação
+  const authenticated = ref(false)
+
+  async function authenticate() {
+    try {
+      //teste simples de autenticação via token fixo
+      await axios.get(`https://bling.com.br/Api/v2/produtos/json?apikey=${token.value}`)
+      authenticated.value = true
+      return true
+    } catch (error) {
+      authenticated.value = false
+      console.error('Erro de autenticação:', error)
+      throw error
+    }
+  }
+
   return {
     selectedColor,
     currentImage,
     isButtonDisabled,
     setSelectedColor,
+    //Autenticação:
+    token,
+    authenticated,
+    authenticate
   }
 })
 
