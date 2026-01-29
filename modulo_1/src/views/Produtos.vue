@@ -5,14 +5,36 @@
         <div class="level-left">
           <h1 class="title">Gestão de Produtos</h1>
         </div>
-        <div class="level-right" v-if="produtosSelecionados.length > 0">
-          <button class="button is-danger" @click="excluirEmMassa">
-            Excluir ({{ produtosSelecionados.length }})
-          </button>
-        </div>
       </div>
 
       <FiltroProdutos :is-loading="carregando" @pesquisar="handlePesquisa" @limpar="handleLimpar" />
+      <div class="level mb-4">
+        <div class="level-left">
+          <div class="field is-grouped is-grouped-multiline is-align-items-center">
+            <p class="control">
+              <button class="button" :class="produtosSelecionados.length > 0 ? 'is-danger' : 'is-light is-disabled'"
+                :disabled="produtosSelecionados.length === 0" @click="excluirEmMassa" title="Excluir selecionados">
+                <span class="icon is-small">
+                  <i class="fas fa-trash"></i>
+                </span>
+                <span>Excluir</span>
+              </button>
+            </p>
+            <p v-if="produtosSelecionados.length > 0" class="control has-text-weight-semibold mr-3">
+              {{ produtosSelecionados.length }} {{ produtosSelecionados.length === 1 ? 'selecionado' : 'selecionados' }}
+            </p>
+          </div>
+        </div>
+
+        <div class="level-right">
+          <button class="button is-primary" @click="irParaInclusao">
+            <span class="icon is-small">
+              <i class="fas fa-plus"></i>
+            </span>
+            <span>Incluir produto</span>
+          </button>
+        </div>
+      </div>
 
       <div v-if="erro" class="notification is-danger mt-5">
         <button class="delete" @click="erro = false"></button>
@@ -94,7 +116,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, reactive, computed } from 'vue'; 
+import { ref, onMounted, onUnmounted, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import Paginacao from '../components/Paginacao.vue';
 import FiltroProdutos from '../components/FiltroProdutos.vue';
@@ -109,7 +131,7 @@ const pagina = ref(1);
 const temMaisPaginas = ref(false);
 
 const produtosSelecionados = ref<number[]>([]);
-const dropdownAberto = ref<number | null>(null); 
+const dropdownAberto = ref<number | null>(null);
 const filtrosAtivos = reactive({
   nome: '',
   sku: '',
@@ -193,7 +215,7 @@ const buscarProdutos = async () => {
 
   carregando.value = true;
   erro.value = false;
-  dropdownAberto.value = null; 
+  dropdownAberto.value = null;
 
   const token = localStorage.getItem('bling_access_token');
   if (!token) {
@@ -246,6 +268,10 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('click', fecharDropdownExterno);
 });
+
+const irParaInclusao = () => {
+  router.push('/produtos/novo');
+};
 </script>
 
 <style scoped>
@@ -271,5 +297,11 @@ onUnmounted(() => {
 
 .dropdown-item {
   cursor: pointer;
+}
+
+.button.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 </style>
