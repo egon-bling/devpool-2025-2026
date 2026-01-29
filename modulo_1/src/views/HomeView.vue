@@ -84,6 +84,9 @@
         <a href="#">Suporte</a>
       </div>
     </footer>
+  <div class="home">
+    <h1>Bem-vindo ao Blegon ERP</h1>
+    <button @click="goToProducts">Acessar Produtos</button>
   </div>
 </template>
 
@@ -135,6 +138,7 @@ const form = reactive({
 function sendMessage() {
   alert('Mensagem enviada com sucesso!\n\Aguarde nosso contato pelo e-mail informado.')
   Object.keys(form).forEach(key => (form[key as keyof typeof form] = ''))
+  router.push('/produtos')
 }
 </script>
 
@@ -290,5 +294,8 @@ function sendMessage() {
 .footer-links a {
   color: #fff;
   margin: 0 8px;
+button {
+  padding: 8px 16px;
+  cursor: pointer;
 }
 </style>
