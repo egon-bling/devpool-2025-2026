@@ -1,12 +1,13 @@
 export const formatProduto = (produto: any) => {
   return {
     nome: produto.nome,
+    tipo: produto.tipo || 'P',
+    situacao: produto.situacao || 'A',
+    formato: produto.formato || 'S', 
     codigo: produto.codigo,
     preco: Number(produto.preco),
-    situacao: produto.situacao || 'A',
     unidade: produto.unidade || 'UN',
-    tipo: 'P', 
-    formato: 'S' 
+    descricaoCurta: produto.descricaoCurta || '' 
   };
 };
 

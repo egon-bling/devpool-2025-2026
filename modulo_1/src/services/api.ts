@@ -1,31 +1,38 @@
-const BASE_URL = "/api-bling/Api/v3"; 
+import axios from 'axios';
 
-export const apiClient = {
-    async request(endpoint: string, method: string = 'GET', token: string, body?: any) {
-        const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-        const url = `${BASE_URL}${cleanEndpoint}`;
+const BASE_URL = "/api-bling/Api/v3";
 
-        const options: RequestInit = {
-            method,
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }
-        };
+export const apiClient = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+});
 
-        if (body) options.body = JSON.stringify(body);
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('bling_access_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-        const response = await fetch(url, options);
-        
-        if (response.status === 204) return true;
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            const msg = errorData.error?.fields?.[0]?.msg || errorData.message || `Erro: ${response.status}`;
-            throw new Error(msg);
-        }
-
-        return await response.json();
+export const requestHandler = {
+  async request(endpoint: string, method: string = 'GET', _unusedToken?: string, body?: any) {
+    try {
+      const response = await apiClient({
+        url: endpoint,
+        method: method,
+        data: body
+      });
+      return response.data; 
+    } catch (error: any) {
+      const msg = error.response?.data?.error?.fields?.[0]?.msg || 
+                  error.response?.data?.message || 
+                  error.message;
+      throw new Error(msg);
     }
+  }
 };

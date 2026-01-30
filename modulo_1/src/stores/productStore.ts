@@ -1,36 +1,61 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { apiClient } from '../services/api';
+import { requestHandler } from '../services/api';
+import { produtoService } from '../services/produtos.services';
 
 export const useProductStore = defineStore('product', () => {
-    const carregando = ref(false);
-    const produtos = ref([]);
+  const carregando = ref(false);
+  const produtos = ref([]);
 
-    async function buscarProdutoPorId(id: string) {
-        const token = localStorage.getItem('bling_access_token') || '';
-        const res = await apiClient.request(`/produtos/${id}`, 'GET', token);
-        return res.data;
+  async function buscarProdutoPorId(id: string) {
+    const res = await requestHandler.request(`/produtos/${id}`, 'GET');
+    return res.data;
+  }
+
+  async function salvarEdicao(id: string, payload: any) {
+    carregando.value = true;
+    try {
+      const { id: _, ...dadosParaEnviar } = payload;
+      await requestHandler.request(`/produtos/${id}`, 'PUT', undefined, dadosParaEnviar);
+      return { sucesso: true };
+    } catch (error: any) {
+      return { sucesso: false, erro: error.message };
+    } finally {
+      carregando.value = false;
     }
+  }
 
-   async function salvarEdicao(id: string, payload: any) {
+  async function cadastrarProduto(payload: any) {
+    carregando.value = true;
+    try {
+      await requestHandler.request('/produtos', 'POST', undefined, payload);
+      return { sucesso: true };
+    } catch (error: any) {
+      return { sucesso: false, erro: error.message };
+    } finally {
+      carregando.value = false;
+    }
+  }
+
+  async function excluirProduto(id: string) {
   carregando.value = true;
   try {
-    const { id: _, ...dadosParaEnviar } = payload; 
-        const token = localStorage.getItem('bling_access_token') || '';
-        await apiClient.request(`/produtos/${id}`, 'PUT', token, dadosParaEnviar);
-    
+    await produtoService.excluir(id, "E");
     return { sucesso: true };
   } catch (error: any) {
-    console.error("Erro ao salvar:", error);
-    return { sucesso: false, erro: error.message };
+    const mensagem = error.response?.data?.error?.message || "Erro ao excluir produto.";
+    return { sucesso: false, erro: mensagem };
   } finally {
     carregando.value = false;
   }
 }
-    return {
-        carregando,
-        produtos,
-        buscarProdutoPorId,
-        salvarEdicao
-    };
+
+  return {
+    carregando,
+    produtos,
+    buscarProdutoPorId,
+    salvarEdicao,
+    cadastrarProduto,
+    excluirProduto
+  };
 });

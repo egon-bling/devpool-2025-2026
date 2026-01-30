@@ -14,6 +14,11 @@ const routes = [
     component: ProdutoEdicao,
     props: true 
   },
+  {
+    path: '/produtos/cadastro',
+    name: 'ProdutoCadastro',
+    component: () => import('../views/ProdutoCadastro.vue')
+  },
 ];
 
 const router = createRouter({

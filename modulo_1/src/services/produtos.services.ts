@@ -1,54 +1,49 @@
 import { apiClient } from './api';
 
 export const produtoService = {
-  async listar(token: string, pagina: number = 1, limite: number = 10, filtros: any = {}) {
-    
-    const prepararParams = (baseParams: URLSearchParams) => {
-      if (filtros.dataInclusaoInicial) baseParams.append('dataInclusaoInicial', filtros.dataInclusaoInicial);
-      if (filtros.dataInclusaoFinal)   baseParams.append('dataInclusaoFinal', filtros.dataInclusaoFinal);
-      if (filtros.dataAlteracaoInicial) baseParams.append('dataAlteracaoInicial', filtros.dataAlteracaoInicial);
-      if (filtros.dataAlteracaoFinal)   baseParams.append('dataAlteracaoFinal', filtros.dataAlteracaoFinal);
-      return baseParams;
+  async listar(pagina: number = 1, limite: number = 10, filtros: any = {}) {
+    const montarParamsBase = (filtrosAdicionais = {}) => {
+      const params: any = {
+        pagina,
+        limite,
+        ...filtrosAdicionais
+      };
+
+      if (filtros.dataInclusaoInicial) params.dataInclusaoInicial = filtros.dataInclusaoInicial;
+      if (filtros.dataInclusaoFinal)   params.dataInclusaoFinal = filtros.dataInclusaoFinal;
+      if (filtros.dataAlteracaoInicial) params.dataAlteracaoInicial = filtros.dataAlteracaoInicial;
+      if (filtros.dataAlteracaoFinal)   params.dataAlteracaoFinal = filtros.dataAlteracaoFinal;
+
+      return params;
     };
 
     if (!filtros.nome || filtros.nome.trim() === '') {
-      const params = new URLSearchParams({
-        pagina: pagina.toString(),
-        limite: limite.toString(),
-        criterio: (filtros.situacao || 1).toString()
-      });
-      
-      prepararParams(params);
-      return await apiClient.request(`/produtos?${params.toString()}`, 'GET', token);
+      try {
+        const response = await apiClient.get('/produtos', {
+          params: montarParamsBase({ criterio: filtros.situacao || 1 })
+        });
+        return response.data;
+      } catch (error) {
+        console.error("Erro ao listar produtos:", error);
+        return { data: [] };
+      }
     }
 
     const termo = filtros.nome.trim();
 
     try {
-      const paramsNome = new URLSearchParams({
-        pagina: pagina.toString(),
-        limite: limite.toString(),
-        nome: termo,
-        criterio: '5'
+      const requestNome = apiClient.get('/produtos', {
+        params: montarParamsBase({ nome: termo, criterio: '5' })
       });
-      prepararParams(paramsNome);
 
-      // Preparamos os parâmetros da busca por SKU
-      const paramsSku = new URLSearchParams({
-        pagina: pagina.toString(),
-        limite: limite.toString(),
-        'codigos[]': termo, // O URLSearchParams cuida dos colchetes
-        criterio: '5'
+      const requestSku = apiClient.get('/produtos', {
+        params: montarParamsBase({ 'codigos[]': termo, criterio: '5' })
       });
-      prepararParams(paramsSku);
 
-      const [resNome, resSku] = await Promise.all([
-        apiClient.request(`/produtos?${paramsNome.toString()}`, 'GET', token),
-        apiClient.request(`/produtos?${paramsSku.toString()}`, 'GET', token)
-      ]);
+      const [resNome, resSku] = await Promise.all([requestNome, requestSku]);
 
-      const produtosNome = resNome.data || [];
-      const produtosSku = resSku.data || [];
+      const produtosNome = resNome.data?.data || [];
+      const produtosSku = resSku.data?.data || [];
       const todosProdutos = [...produtosNome, ...produtosSku];
 
       const listaFinal = todosProdutos.filter((produto: any, index: number, self: any[]) =>
@@ -61,5 +56,17 @@ export const produtoService = {
       console.error("Erro na busca com filtros:", error);
       return { data: [] };
     }
+  }, 
+
+  async excluir(id: string | number, excluirProduto: 'A' | 'I' | 'E') {
+  try {
+    const response = await apiClient.patch(`/produtos/${id}/situacoes`, {
+      situacao: excluirProduto
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao mudar situação do produto:", error);
+    throw error;
   }
+}
 };
