@@ -51,4 +51,7 @@ const funcionalidadesMock = [
   justify-content: center;
   align-items: center;
 }
+section {
+  margin-bottom: 140px;
+}
 </style>

@@ -41,3 +41,12 @@ h1, h2, h3 {
 .button:active {
     transform: translateY(-1px) !important;
 }
+
+.container-formulario {
+  padding-top: 120px; 
+  padding-bottom: 40px;
+}
+
+.section {
+  padding-top: 120px;
+}
