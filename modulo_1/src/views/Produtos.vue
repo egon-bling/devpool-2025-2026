@@ -106,6 +106,24 @@ onMounted(() => {
 <template>
   <div class="min-h-screen bg-slate-50 pt-24 p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
+
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Meus Produtos</h1>
+          <p class="text-slate-500 text-sm">Gerencie seu catálogo integrado ao Bling</p>
+        </div>
+
+        <button 
+          @click="Cadastro" 
+          class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 w-full md:w-auto justify-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+          Novo Produto
+        </button>
+      </div>
+      
       <FiltroProdutos v-model="filtros" @filtrar="aplicarFiltros" @limpar="limparFiltros" />
       
       <Transition name="fade">

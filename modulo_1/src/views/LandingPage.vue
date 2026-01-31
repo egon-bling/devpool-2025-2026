@@ -1,9 +1,20 @@
 <template>
     <BarraHome/>
     <main>
-    <HeroInicial/>
-    <PlanosInicial/>
-    <ContatoInicial/>
+        <section id="inicio">
+            <HeroInicial/>
+        </section>
+
+        <section id="funcionalidades">
+            </section>
+
+        <section id="planos">
+            <PlanosInicial/>
+        </section>
+
+        <section id="contato">
+            <ContatoInicial/>
+        </section>
     </main>
 </template>
 
@@ -15,5 +26,8 @@ import BarraHome from '../components/Home/BarraHome.vue';
 </script>
 
 <style scoped>
- 
+html {
+  scroll-behavior: smooth; 
+  scroll-padding-top: 80px; 
+}
 </style>
