@@ -1,19 +1,23 @@
-<template>
-  <main>
-    <h1>Produto com Pinia</h1>
-    <div class="container">
-      <div class="column">
-        <ProductPage />
-      </div>
-    </div>
-  </main>
-</template>
-
 <script setup lang="ts">
-import ProductPage from './components/ProductPage.vue';
+import { onMounted } from 'vue';
+import { useAuthStore } from './stores/authStore';
+import BarraHome from './components/Home/BarraHome.vue';
+
+const authStore = useAuthStore();
+
+onMounted(() => {
+  if (!window.location.search.includes('code=')) {
+    authStore.finalizarCarregamento();
+  }
+}); 
 </script>
 
-<style>
-/* Estilos adicionais específicos do App */
-</style>
-
+<template>
+  <div class="antialiased font-sans text-slate-900 min-h-screen bg-slate-50">
+    <BarraHome />
+    
+    <main class="pt-24 md:pt-28"> 
+      <router-view />
+    </main>
+  </div>
+</template>
