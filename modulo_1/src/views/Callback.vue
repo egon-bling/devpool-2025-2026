@@ -69,13 +69,13 @@ const tokenManual = ref('');
 
 const CLIENT_ID = import.meta.env.VITE_BLING_CLIENT_ID;
 const CLIENT_SECRET = import.meta.env.VITE_BLING_CLIENT_SECRET;
-const REDIRECT_URI = 'http://localhost:5173/callback'; 
+const REDIRECT_URI = 'http://localhost:5173/callback';
 
 onMounted(async () => {
   const code = route.query.code as string;
   const state = route.query.state as string;
   const savedState = localStorage.getItem('auth_state');
-  
+
   authCode.value = code;
 
 
@@ -90,7 +90,7 @@ onMounted(async () => {
     return;
   }
 
-  
+
   try {
     const credentials = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
     const urlencoded = new URLSearchParams({
@@ -112,7 +112,7 @@ onMounted(async () => {
 
     if (resposta.ok) {
       const dados = await resposta.json();
-      sucesso.value = true; 
+      sucesso.value = true;
       loading.value = false;
       finalizarLogin(dados.access_token);
     } else {
@@ -122,15 +122,19 @@ onMounted(async () => {
     if (!sucesso.value) {
       console.warn("Troca automática indisponível. Ativando contingência manual.");
       loading.value = false;
-      erroCors.value = true; 
+      erroCors.value = true;
     }
   }
 });
 
 const finalizarLogin = (token: string) => {
+  const seisHorasEmMs = 6 * 60 * 60 * 1000;
+  const dataExpiracao = new Date().getTime() + seisHorasEmMs;
+
   localStorage.setItem('bling_access_token', token);
+  localStorage.setItem('bling_token_expires', dataExpiracao.toString());
   localStorage.removeItem('auth_state');
-  
+
   setTimeout(() => {
     router.push('/produtos');
   }, 1500);

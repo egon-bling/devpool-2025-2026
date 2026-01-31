@@ -44,15 +44,15 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { loginNoBling } from '../services/auth';
+import { loginNoBling, isTokenValido } from '../services/auth';
 
 const route = useRoute();
 const router = useRouter();
 const menuAtivo = ref(false);
-const token = ref(localStorage.getItem('bling_access_token'));
+const token = ref(isTokenValido());
 
 const atualizarStatusSessao = () => {
-  token.value = localStorage.getItem('bling_access_token');
+  token.value = isTokenValido();
 };
 
 watch(() => route.path, () => {
@@ -66,7 +66,8 @@ const iniciarLogin = () => loginNoBling();
 
 const logout = () => {
   localStorage.removeItem('bling_access_token');
-  token.value = null;
+  localStorage.removeItem('bling_token_expires');
+  token.value = false;
   router.push('/');
 };
 </script>
