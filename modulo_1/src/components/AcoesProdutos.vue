@@ -3,17 +3,11 @@
     <div class="level-left">
       <div class="field is-grouped is-grouped-multiline is-align-items-center">
         <p class="control">
-          <button 
-            class="button" 
-            :class="quantidadeSelecionados > 0 ? 'is-danger' : 'is-light is-disabled'"
-            :disabled="quantidadeSelecionados === 0" 
-            @click="$emit('excluir-massa')"
-            title="Excluir selecionados"
-          >
-            <span class="icon is-small">
-              <i class="fas fa-trash"></i>
-            </span>
-            <span>Excluir</span>
+          <button v-if="modoLixeira" class="button is-success" :disabled="quantidadeSelecionados === 0" @click="$emit('restaurar-massa')">
+            <span class="icon"><i class="fas fa-undo"></i></span>
+          </button>
+          <button v-else class="button is-danger" :disabled="quantidadeSelecionados === 0" @click="$emit('excluir-massa')">
+            <span class="icon"><i class="fas fa-trash"></i></span>
           </button>
         </p>
         <p v-if="quantidadeSelecionados > 0" class="control has-text-weight-semibold mr-3">
@@ -36,9 +30,10 @@
 <script setup lang="ts">
 defineProps<{
   quantidadeSelecionados: number;
+  modoLixeira: boolean;
 }>();
 
-defineEmits(['excluir-massa', 'incluir']);
+defineEmits(['excluir-massa', 'incluir', 'restaurar-massa']);
 </script>
 
 <style scoped>

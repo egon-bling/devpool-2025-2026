@@ -8,11 +8,7 @@
       <thead>
         <tr>
           <th style="width: 40px;">
-            <input 
-              type="checkbox" 
-              :checked="selecionouTodos" 
-              @change="$emit('toggle-todos')"
-            >
+            <input type="checkbox" :checked="selecionouTodos" @change="$emit('toggle-todos')">
           </th>
           <th style="width: 160px;">Código (SKU)</th>
           <th>Nome</th>
@@ -24,11 +20,8 @@
       <tbody>
         <tr v-for="produto in produtos" :key="produto.id">
           <td>
-            <input 
-              type="checkbox" 
-              :checked="selecionados.includes(produto.id)"
-              @change="$emit('update:selecionados', produto.id)"
-            >
+            <input type="checkbox" :checked="selecionados.includes(produto.id)"
+              @change="$emit('update:selecionados', produto.id)">
           </td>
           <td class="truncate" :title="produto.codigo">
             <strong>{{ produto.codigo }}</strong>
@@ -53,13 +46,16 @@
               </div>
               <div class="dropdown-menu" role="menu">
                 <div class="dropdown-content">
-                  <a @click="$emit('editar', produto.id)" class="dropdown-item">
-                     Editar
-                  </a>
+                  <a @click="$emit('editar', produto.id)" class="dropdown-item">Editar</a>
                   <hr class="dropdown-divider">
-                  <a @click="$emit('excluir', produto.id)" class="dropdown-item has-text-danger">
-                     Excluir
-                  </a>
+
+                  <template v-if="produto.situacao === 'E'">
+                    <a @click="$emit('restaurar', produto.id)" class="dropdown-item has-text-success">Restaurar</a>
+                  </template>
+
+                  <template v-else>
+                    <a @click="$emit('excluir', produto.id)" class="dropdown-item has-text-danger">Excluir</a>
+                  </template>
                 </div>
               </div>
             </div>
@@ -86,11 +82,12 @@ defineProps<{
 }>();
 
 defineEmits([
-  'editar', 
-  'excluir', 
-  'toggle-todos', 
-  'update:selecionados', 
-  'toggle-dropdown'
+  'editar',
+  'excluir',
+  'toggle-todos',
+  'update:selecionados',
+  'toggle-dropdown',
+  'restaurar'
 ]);
 
 const formatarPreco = (valor: any) => {
@@ -109,9 +106,31 @@ const getLabelSituacao = (situacao: string) => {
 </script>
 
 <style scoped>
-.table-fixed { table-layout: fixed; width: 100%; }
-.table td, .table th { vertical-align: middle !important; }
-.truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.table-container-fixed { min-height: 550px; }
-.dropdown-item { cursor: pointer; }
+.table-fixed {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.table td,
+.table th {
+  vertical-align: middle !important;
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-container-fixed {
+  min-height: 550px;
+}
+
+.dropdown-item {
+  cursor: pointer;
+  text-align: left;
+  display: block;
+  width: 100%;
+  padding: 0.375rem 1rem
+}
 </style>
