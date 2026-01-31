@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useAuthStore } from './stores/authStore';
+import { useRoute } from 'vue-router'; 
 import BarraHome from './components/Home/BarraHome.vue';
 
 const authStore = useAuthStore();
+const route = useRoute();
 
 onMounted(() => {
-  authStore.finalizarCarregamento();
+  if (!window.location.search.includes('code=')) {
+    authStore.finalizarCarregamento();
+  }
 }); 
 </script>
 

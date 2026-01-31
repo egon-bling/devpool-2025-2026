@@ -16,22 +16,20 @@
     });
 
     const TextoSec = computed(() => {
-    if (mode.value === 'logout') return 'Até mais! Redirecionando...';
-    if (mode.value === 'error') return 'Não foi possível conectar no Bling.';
-    return 'Aguarde enquanto sincronizamos sua conta.';
+        if (mode.value === 'logout') return 'Até mais! Redirecionando...';
+        if (mode.value === 'error') return 'Não foi possível conectar no Bling.';
+        return 'Aguarde enquanto sincronizamos sua conta.';
     });
 
     onMounted(async () => {
-        //logout
         if (mode.value === 'logout') {
             authStore.logout();
             setTimeout(() => router.push('/'), 1500);
-            return
+            return;
         }
-        //sucesso
-        const { code, state } = route.query;
-        const savedState = localStorage.getItem('bling_state');
-        //validacao
+        const { code, state } = route.query
+        const savedState = localStorage.getItem('auth_state'); 
+
         if (!code || !state || state !== savedState) {
             console.error('State inválido ou código ausente');
             router.push('/?error=invalid_state');
@@ -39,12 +37,14 @@
         }
 
         try {
-            await authStore.handelAuthCallback(code);
-            localStorage.removeItem('bling_state');
+            await authStore.handleAuthCallback(code, state); 
+            
+            localStorage.removeItem('auth_state');
+            
             router.push('/produtos');
         } catch (error){
             console.error('Falha ao obter token:', error);
-            router.push('/');
+            router.push('/?error=token_failure');
         }
     });
 </script>

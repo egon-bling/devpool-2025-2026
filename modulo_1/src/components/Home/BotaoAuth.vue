@@ -10,10 +10,10 @@ const router = useRouter();
         const urlRetorno = 'http://localhost:5173/auth';
         const redirect = encodeURIComponent(urlRetorno);  
         
-        localStorage.removeItem('bling_state');
+        localStorage.removeItem('auth_state');
     
         const state = Math.random().toString(36).substring(7);
-        localStorage.setItem('bling_state', state); 
+        localStorage.setItem('auth_state', state); 
         
         const authUrl = `https://www.bling.com.br/Api/v3/oauth/authorize?response_type=code&client_id=${clientId}&state=${state}&redirect=${redirect}`;
         window.location.href = authUrl;
@@ -29,8 +29,9 @@ const router = useRouter();
   <div class="flex items-center gap-4">
     <template v-if="!authStore.carregandoAuth">
       
+      
       <button 
-        v-if="!authStore.isAutenticated" 
+        v-if="!authStore.isAuthenticated" 
         @click="loginAPI" 
         class="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md active:scale-95"
       >

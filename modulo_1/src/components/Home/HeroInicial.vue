@@ -20,7 +20,7 @@
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
           <button 
-            v-if="!authStore.isAutenticated"
+            v-if="!authStore.isAuthenticated"
             @click="loginAPI" 
             class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-blue-200"
           >
@@ -44,7 +44,7 @@
         <div class="absolute -top-10 -right-10 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
         
         <img 
-          src="../../assets/logo.png" 
+          src="../../../public/logo.png" 
           alt="Interface Bingo ERP" 
           class="relative z-10  transition duration-500"
         />
