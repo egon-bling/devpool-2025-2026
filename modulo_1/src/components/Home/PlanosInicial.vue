@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { lista_planos } from '../../mocks/planos';
+</script>
+
 <template>
   <section id="planos" class="py-20 bg-white">
     <div class="container mx-auto px-6">
@@ -47,6 +51,3 @@
   </section>
 </template>
 
-<script setup lang="ts">
-import { lista_planos } from '../../mocks/planos';
-</script>

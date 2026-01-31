@@ -1,3 +1,24 @@
+<script setup lang="ts">
+import { useAuthStore } from '../../stores/authStore';
+import { useRouter } from 'vue-router';
+
+const authStore = useAuthStore();
+const router = useRouter();
+
+const loginAPI = () => {
+    const clientId = '0c983835be17486ddac231a6e8a1fd4e624523e6'; 
+    const urlRetorno = 'http://localhost:5173/auth';
+    const redirect = encodeURIComponent(urlRetorno); 
+    
+    localStorage.removeItem('bling_state'); 
+    const state = Math.random().toString(36).substring(7);
+    localStorage.setItem('bling_state', state); 
+    
+    const authUrl = `https://www.bling.com.br/Api/v3/oauth/authorize?response_type=code&client_id=${clientId}&state=${state}&redirect=${redirect}`;
+    window.location.href = authUrl;
+};
+</script>
+
 <template>
   <section id="inicio" class="min-h-[calc(100vh-80px)] flex items-center bg-gradient-to-br from-blue-50 to-white py-12 md:py-20 overflow-hidden relative">
     
@@ -53,27 +74,6 @@
     </div>
   </section>
 </template>
-
-<script setup lang="ts">
-import { useAuthStore } from '../../stores/authStore';
-import { useRouter } from 'vue-router';
-
-const authStore = useAuthStore();
-const router = useRouter();
-
-const loginAPI = () => {
-    const clientId = '0c983835be17486ddac231a6e8a1fd4e624523e6'; 
-    const urlRetorno = 'http://localhost:5173/auth';
-    const redirect = encodeURIComponent(urlRetorno); 
-    
-    localStorage.removeItem('bling_state'); 
-    const state = Math.random().toString(36).substring(7);
-    localStorage.setItem('bling_state', state); 
-    
-    const authUrl = `https://www.bling.com.br/Api/v3/oauth/authorize?response_type=code&client_id=${clientId}&state=${state}&redirect=${redirect}`;
-    window.location.href = authUrl;
-};
-</script>
 
 <style scoped>
 @keyframes blob {

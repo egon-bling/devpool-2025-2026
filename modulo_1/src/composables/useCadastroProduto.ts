@@ -36,7 +36,7 @@ export function useCadastroProduto(mostrarToast: (msg: string, tipo?: 'sucesso' 
       return false;
     }
 
-    if (Number(produto.value.preco) <= 0) { // Garantindo que é número na validação
+    if (Number(produto.value.preco) <= 0) { 
       mostrarToast("O preço deve ser maior que zero", "erro");
       erros.value.preco = "Preço inválido";
       return false;

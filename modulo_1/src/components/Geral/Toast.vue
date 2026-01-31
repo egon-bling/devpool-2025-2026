@@ -1,3 +1,11 @@
+<script setup>
+defineProps({
+  exibir: Boolean,
+  mensagem: String,
+  tipo: { type: String, default: 'sucesso' } 
+});
+</script>
+
 <template>
   <Transition
     enter-active-class="transform transition duration-300 ease-out"
@@ -28,10 +36,3 @@
   </Transition>
 </template>
 
-<script setup>
-defineProps({
-  exibir: Boolean,
-  mensagem: String,
-  tipo: { type: String, default: 'sucesso' } 
-});
-</script>

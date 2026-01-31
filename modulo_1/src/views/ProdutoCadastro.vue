@@ -6,14 +6,12 @@ import Toast from '../components/Geral/Toast.vue';
 
 const router = useRouter();
 
-// Lógica local para o Toast
 const toastConfig = ref({ exibir: false, mensagem: '', tipo: 'sucesso' as 'sucesso' | 'erro' });
 const mostrarToast = (msg: string, tipo: 'sucesso' | 'erro' = 'sucesso') => {
   toastConfig.value = { exibir: true, mensagem: msg, tipo };
   setTimeout(() => { toastConfig.value.exibir = false; }, 4000);
 };
 
-// Consumindo nosso Composable com a lógica completa
 const { produto, salvando, erros, mensagemErro, cadastrar } = useCadastroProduto(mostrarToast);
 </script>
 
@@ -27,7 +25,7 @@ const { produto, salvando, erros, mensagemErro, cadastrar } = useCadastroProduto
       </header>
 
       <div v-if="mensagemErro" class="mb-8 p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm flex justify-between items-center shadow-sm">
-        <span class="flex items-center gap-2 font-medium">⚠️ {{ mensagemErro }}</span>
+        <span class="flex items-center gap-2 font-medium">Erro {{ mensagemErro }}</span>
         <button @click="mensagemErro = ''" class="text-rose-400 hover:text-rose-600 text-xl font-bold">&times;</button>
       </div>
 

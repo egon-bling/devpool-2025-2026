@@ -1,3 +1,7 @@
+<script setup lang="ts">
+defineProps<{ aberto: boolean }>();
+</script>
+
 <template>
   <div v-if="aberto" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
     <div class="bg-white p-8 rounded-2xl shadow-2xl flex flex-col items-center max-w-xs w-full">
@@ -13,7 +17,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-defineProps<{ aberto: boolean }>();
-</script>
